@@ -1,0 +1,979 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "evidence_interpretation": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "supporting_anchor_ids": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 1
+            },
+            "localized_facts": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "anchor_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "transition_id": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "observation_before_quote": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "observation_after_quote": {
+                    "type": "string",
+                    "minLength": 1
+                  },
+                  "role_bindings": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "target": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "source": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "destination": {
+                        "type": "string",
+                        "minLength": 1
+                      },
+                      "candidate": {
+                        "type": "string",
+                        "minLength": 1
+                      }
+                    },
+                    "required": []
+                  }
+                },
+                "required": [
+                  "anchor_id",
+                  "transition_id",
+                  "observation_before_quote",
+                  "observation_after_quote",
+                  "role_bindings"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 5
+            },
+            "procedural_residual": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "type": {
+                  "enum": [
+                    "prerequisite",
+                    "ordering_constraint",
+                    "verification_step",
+                    "recovery_rule",
+                    "conditional_branch"
+                  ]
+                },
+                "rule": {
+                  "enum": [
+                    "arrival_reveals_state",
+                    "opening_reveals_contents",
+                    "placement_confirmation",
+                    "placement_requires_arrival",
+                    "recover_from_rejected_action",
+                    "taking_establishes_possession"
+                  ]
+                },
+                "relation": {
+                  "type": "string",
+                  "minLength": 1
+                }
+              },
+              "required": [
+                "type",
+                "rule",
+                "relation"
+              ]
+            },
+            "implicated_skill_fields": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "applicability",
+                  "procedure",
+                  "outcome_check",
+                  "fallback"
+                ]
+              },
+              "minItems": 0,
+              "maxItems": 4
+            }
+          },
+          "required": [
+            "supporting_anchor_ids",
+            "localized_facts",
+            "procedural_residual",
+            "implicated_skill_fields"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "skill_proposal": {
+      "anyOf": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "operation": {
+              "const": "ADD"
+            },
+            "skill_id": {
+              "type": "null"
+            },
+            "supporting_anchor_ids": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 1
+            },
+            "applicability": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "reachable(source)",
+                  "reachable(destination)",
+                  "reachable(candidate)",
+                  "at(source)",
+                  "at(destination)",
+                  "at(candidate)",
+                  "not_at(source)",
+                  "not_at(destination)",
+                  "not_at(candidate)",
+                  "closed(source)",
+                  "closed(destination)",
+                  "closed(candidate)",
+                  "open(source)",
+                  "open(destination)",
+                  "open(candidate)",
+                  "contents_observed(source)",
+                  "contents_observed(destination)",
+                  "contents_observed(candidate)",
+                  "contents_unobserved(source)",
+                  "contents_unobserved(destination)",
+                  "contents_unobserved(candidate)",
+                  "transfer_task(target,destination)",
+                  "holding(target)",
+                  "not_holding(target)",
+                  "placed(target,destination)",
+                  "placement_unconfirmed(target,destination)",
+                  "action_rejected()",
+                  "visible(target,source)",
+                  "visible(target,candidate)"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 5
+            },
+            "procedure": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "op": {
+                    "enum": [
+                      "NAVIGATE",
+                      "INSPECT",
+                      "OPEN_IF_NEEDED",
+                      "ACQUIRE",
+                      "PLACE",
+                      "VERIFY"
+                    ]
+                  },
+                  "args": {
+                    "type": "array",
+                    "items": {
+                      "enum": [
+                        "target",
+                        "source",
+                        "destination",
+                        "candidate",
+                        "reachable(source)",
+                        "reachable(destination)",
+                        "reachable(candidate)",
+                        "at(source)",
+                        "at(destination)",
+                        "at(candidate)",
+                        "not_at(source)",
+                        "not_at(destination)",
+                        "not_at(candidate)",
+                        "closed(source)",
+                        "closed(destination)",
+                        "closed(candidate)",
+                        "open(source)",
+                        "open(destination)",
+                        "open(candidate)",
+                        "contents_observed(source)",
+                        "contents_observed(destination)",
+                        "contents_observed(candidate)",
+                        "contents_unobserved(source)",
+                        "contents_unobserved(destination)",
+                        "contents_unobserved(candidate)",
+                        "transfer_task(target,destination)",
+                        "holding(target)",
+                        "not_holding(target)",
+                        "placed(target,destination)",
+                        "placement_unconfirmed(target,destination)",
+                        "action_rejected()",
+                        "visible(target,source)",
+                        "visible(target,candidate)"
+                      ]
+                    },
+                    "minItems": 1,
+                    "maxItems": 2
+                  },
+                  "when": {
+                    "type": "array",
+                    "items": {
+                      "enum": [
+                        "reachable(source)",
+                        "reachable(destination)",
+                        "reachable(candidate)",
+                        "at(source)",
+                        "at(destination)",
+                        "at(candidate)",
+                        "not_at(source)",
+                        "not_at(destination)",
+                        "not_at(candidate)",
+                        "closed(source)",
+                        "closed(destination)",
+                        "closed(candidate)",
+                        "open(source)",
+                        "open(destination)",
+                        "open(candidate)",
+                        "contents_observed(source)",
+                        "contents_observed(destination)",
+                        "contents_observed(candidate)",
+                        "contents_unobserved(source)",
+                        "contents_unobserved(destination)",
+                        "contents_unobserved(candidate)",
+                        "transfer_task(target,destination)",
+                        "holding(target)",
+                        "not_holding(target)",
+                        "placed(target,destination)",
+                        "placement_unconfirmed(target,destination)",
+                        "action_rejected()",
+                        "visible(target,source)",
+                        "visible(target,candidate)"
+                      ]
+                    },
+                    "minItems": 0,
+                    "maxItems": 4
+                  }
+                },
+                "required": [
+                  "op",
+                  "args"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 8
+            },
+            "outcome_check": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "reachable(source)",
+                  "reachable(destination)",
+                  "reachable(candidate)",
+                  "at(source)",
+                  "at(destination)",
+                  "at(candidate)",
+                  "not_at(source)",
+                  "not_at(destination)",
+                  "not_at(candidate)",
+                  "closed(source)",
+                  "closed(destination)",
+                  "closed(candidate)",
+                  "open(source)",
+                  "open(destination)",
+                  "open(candidate)",
+                  "contents_observed(source)",
+                  "contents_observed(destination)",
+                  "contents_observed(candidate)",
+                  "contents_unobserved(source)",
+                  "contents_unobserved(destination)",
+                  "contents_unobserved(candidate)",
+                  "transfer_task(target,destination)",
+                  "holding(target)",
+                  "not_holding(target)",
+                  "placed(target,destination)",
+                  "placement_unconfirmed(target,destination)",
+                  "action_rejected()",
+                  "visible(target,source)",
+                  "visible(target,candidate)"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 5
+            },
+            "fallback": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "when": {
+                  "type": "array",
+                  "items": {
+                    "enum": [
+                      "reachable(source)",
+                      "reachable(destination)",
+                      "reachable(candidate)",
+                      "at(source)",
+                      "at(destination)",
+                      "at(candidate)",
+                      "not_at(source)",
+                      "not_at(destination)",
+                      "not_at(candidate)",
+                      "closed(source)",
+                      "closed(destination)",
+                      "closed(candidate)",
+                      "open(source)",
+                      "open(destination)",
+                      "open(candidate)",
+                      "contents_observed(source)",
+                      "contents_observed(destination)",
+                      "contents_observed(candidate)",
+                      "contents_unobserved(source)",
+                      "contents_unobserved(destination)",
+                      "contents_unobserved(candidate)",
+                      "transfer_task(target,destination)",
+                      "holding(target)",
+                      "not_holding(target)",
+                      "placed(target,destination)",
+                      "placement_unconfirmed(target,destination)",
+                      "action_rejected()",
+                      "visible(target,source)",
+                      "visible(target,candidate)"
+                    ]
+                  },
+                  "minItems": 1,
+                  "maxItems": 5
+                },
+                "procedure": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "op": {
+                        "enum": [
+                          "NAVIGATE",
+                          "INSPECT",
+                          "OPEN_IF_NEEDED",
+                          "ACQUIRE",
+                          "PLACE",
+                          "VERIFY"
+                        ]
+                      },
+                      "args": {
+                        "type": "array",
+                        "items": {
+                          "enum": [
+                            "target",
+                            "source",
+                            "destination",
+                            "candidate",
+                            "reachable(source)",
+                            "reachable(destination)",
+                            "reachable(candidate)",
+                            "at(source)",
+                            "at(destination)",
+                            "at(candidate)",
+                            "not_at(source)",
+                            "not_at(destination)",
+                            "not_at(candidate)",
+                            "closed(source)",
+                            "closed(destination)",
+                            "closed(candidate)",
+                            "open(source)",
+                            "open(destination)",
+                            "open(candidate)",
+                            "contents_observed(source)",
+                            "contents_observed(destination)",
+                            "contents_observed(candidate)",
+                            "contents_unobserved(source)",
+                            "contents_unobserved(destination)",
+                            "contents_unobserved(candidate)",
+                            "transfer_task(target,destination)",
+                            "holding(target)",
+                            "not_holding(target)",
+                            "placed(target,destination)",
+                            "placement_unconfirmed(target,destination)",
+                            "action_rejected()",
+                            "visible(target,source)",
+                            "visible(target,candidate)"
+                          ]
+                        },
+                        "minItems": 1,
+                        "maxItems": 2
+                      },
+                      "when": {
+                        "type": "array",
+                        "items": {
+                          "enum": [
+                            "reachable(source)",
+                            "reachable(destination)",
+                            "reachable(candidate)",
+                            "at(source)",
+                            "at(destination)",
+                            "at(candidate)",
+                            "not_at(source)",
+                            "not_at(destination)",
+                            "not_at(candidate)",
+                            "closed(source)",
+                            "closed(destination)",
+                            "closed(candidate)",
+                            "open(source)",
+                            "open(destination)",
+                            "open(candidate)",
+                            "contents_observed(source)",
+                            "contents_observed(destination)",
+                            "contents_observed(candidate)",
+                            "contents_unobserved(source)",
+                            "contents_unobserved(destination)",
+                            "contents_unobserved(candidate)",
+                            "transfer_task(target,destination)",
+                            "holding(target)",
+                            "not_holding(target)",
+                            "placed(target,destination)",
+                            "placement_unconfirmed(target,destination)",
+                            "action_rejected()",
+                            "visible(target,source)",
+                            "visible(target,candidate)"
+                          ]
+                        },
+                        "minItems": 0,
+                        "maxItems": 4
+                      }
+                    },
+                    "required": [
+                      "op",
+                      "args"
+                    ]
+                  },
+                  "minItems": 1,
+                  "maxItems": 8
+                },
+                "outcome_check": {
+                  "type": "array",
+                  "items": {
+                    "enum": [
+                      "reachable(source)",
+                      "reachable(destination)",
+                      "reachable(candidate)",
+                      "at(source)",
+                      "at(destination)",
+                      "at(candidate)",
+                      "not_at(source)",
+                      "not_at(destination)",
+                      "not_at(candidate)",
+                      "closed(source)",
+                      "closed(destination)",
+                      "closed(candidate)",
+                      "open(source)",
+                      "open(destination)",
+                      "open(candidate)",
+                      "contents_observed(source)",
+                      "contents_observed(destination)",
+                      "contents_observed(candidate)",
+                      "contents_unobserved(source)",
+                      "contents_unobserved(destination)",
+                      "contents_unobserved(candidate)",
+                      "transfer_task(target,destination)",
+                      "holding(target)",
+                      "not_holding(target)",
+                      "placed(target,destination)",
+                      "placement_unconfirmed(target,destination)",
+                      "action_rejected()",
+                      "visible(target,source)",
+                      "visible(target,candidate)"
+                    ]
+                  },
+                  "minItems": 1,
+                  "maxItems": 5
+                }
+              },
+              "required": [
+                "when",
+                "procedure",
+                "outcome_check"
+              ]
+            }
+          },
+          "required": [
+            "operation",
+            "skill_id",
+            "supporting_anchor_ids",
+            "applicability",
+            "procedure",
+            "outcome_check",
+            "fallback"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "operation": {
+              "const": "REVISE"
+            },
+            "skill_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "supporting_anchor_ids": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 1
+            },
+            "applicability": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "reachable(source)",
+                  "reachable(destination)",
+                  "reachable(candidate)",
+                  "at(source)",
+                  "at(destination)",
+                  "at(candidate)",
+                  "not_at(source)",
+                  "not_at(destination)",
+                  "not_at(candidate)",
+                  "closed(source)",
+                  "closed(destination)",
+                  "closed(candidate)",
+                  "open(source)",
+                  "open(destination)",
+                  "open(candidate)",
+                  "contents_observed(source)",
+                  "contents_observed(destination)",
+                  "contents_observed(candidate)",
+                  "contents_unobserved(source)",
+                  "contents_unobserved(destination)",
+                  "contents_unobserved(candidate)",
+                  "transfer_task(target,destination)",
+                  "holding(target)",
+                  "not_holding(target)",
+                  "placed(target,destination)",
+                  "placement_unconfirmed(target,destination)",
+                  "action_rejected()",
+                  "visible(target,source)",
+                  "visible(target,candidate)"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 5
+            },
+            "procedure": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "additionalProperties": false,
+                "properties": {
+                  "op": {
+                    "enum": [
+                      "NAVIGATE",
+                      "INSPECT",
+                      "OPEN_IF_NEEDED",
+                      "ACQUIRE",
+                      "PLACE",
+                      "VERIFY"
+                    ]
+                  },
+                  "args": {
+                    "type": "array",
+                    "items": {
+                      "enum": [
+                        "target",
+                        "source",
+                        "destination",
+                        "candidate",
+                        "reachable(source)",
+                        "reachable(destination)",
+                        "reachable(candidate)",
+                        "at(source)",
+                        "at(destination)",
+                        "at(candidate)",
+                        "not_at(source)",
+                        "not_at(destination)",
+                        "not_at(candidate)",
+                        "closed(source)",
+                        "closed(destination)",
+                        "closed(candidate)",
+                        "open(source)",
+                        "open(destination)",
+                        "open(candidate)",
+                        "contents_observed(source)",
+                        "contents_observed(destination)",
+                        "contents_observed(candidate)",
+                        "contents_unobserved(source)",
+                        "contents_unobserved(destination)",
+                        "contents_unobserved(candidate)",
+                        "transfer_task(target,destination)",
+                        "holding(target)",
+                        "not_holding(target)",
+                        "placed(target,destination)",
+                        "placement_unconfirmed(target,destination)",
+                        "action_rejected()",
+                        "visible(target,source)",
+                        "visible(target,candidate)"
+                      ]
+                    },
+                    "minItems": 1,
+                    "maxItems": 2
+                  },
+                  "when": {
+                    "type": "array",
+                    "items": {
+                      "enum": [
+                        "reachable(source)",
+                        "reachable(destination)",
+                        "reachable(candidate)",
+                        "at(source)",
+                        "at(destination)",
+                        "at(candidate)",
+                        "not_at(source)",
+                        "not_at(destination)",
+                        "not_at(candidate)",
+                        "closed(source)",
+                        "closed(destination)",
+                        "closed(candidate)",
+                        "open(source)",
+                        "open(destination)",
+                        "open(candidate)",
+                        "contents_observed(source)",
+                        "contents_observed(destination)",
+                        "contents_observed(candidate)",
+                        "contents_unobserved(source)",
+                        "contents_unobserved(destination)",
+                        "contents_unobserved(candidate)",
+                        "transfer_task(target,destination)",
+                        "holding(target)",
+                        "not_holding(target)",
+                        "placed(target,destination)",
+                        "placement_unconfirmed(target,destination)",
+                        "action_rejected()",
+                        "visible(target,source)",
+                        "visible(target,candidate)"
+                      ]
+                    },
+                    "minItems": 0,
+                    "maxItems": 4
+                  }
+                },
+                "required": [
+                  "op",
+                  "args"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 8
+            },
+            "outcome_check": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "reachable(source)",
+                  "reachable(destination)",
+                  "reachable(candidate)",
+                  "at(source)",
+                  "at(destination)",
+                  "at(candidate)",
+                  "not_at(source)",
+                  "not_at(destination)",
+                  "not_at(candidate)",
+                  "closed(source)",
+                  "closed(destination)",
+                  "closed(candidate)",
+                  "open(source)",
+                  "open(destination)",
+                  "open(candidate)",
+                  "contents_observed(source)",
+                  "contents_observed(destination)",
+                  "contents_observed(candidate)",
+                  "contents_unobserved(source)",
+                  "contents_unobserved(destination)",
+                  "contents_unobserved(candidate)",
+                  "transfer_task(target,destination)",
+                  "holding(target)",
+                  "not_holding(target)",
+                  "placed(target,destination)",
+                  "placement_unconfirmed(target,destination)",
+                  "action_rejected()",
+                  "visible(target,source)",
+                  "visible(target,candidate)"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 5
+            },
+            "fallback": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "when": {
+                  "type": "array",
+                  "items": {
+                    "enum": [
+                      "reachable(source)",
+                      "reachable(destination)",
+                      "reachable(candidate)",
+                      "at(source)",
+                      "at(destination)",
+                      "at(candidate)",
+                      "not_at(source)",
+                      "not_at(destination)",
+                      "not_at(candidate)",
+                      "closed(source)",
+                      "closed(destination)",
+                      "closed(candidate)",
+                      "open(source)",
+                      "open(destination)",
+                      "open(candidate)",
+                      "contents_observed(source)",
+                      "contents_observed(destination)",
+                      "contents_observed(candidate)",
+                      "contents_unobserved(source)",
+                      "contents_unobserved(destination)",
+                      "contents_unobserved(candidate)",
+                      "transfer_task(target,destination)",
+                      "holding(target)",
+                      "not_holding(target)",
+                      "placed(target,destination)",
+                      "placement_unconfirmed(target,destination)",
+                      "action_rejected()",
+                      "visible(target,source)",
+                      "visible(target,candidate)"
+                    ]
+                  },
+                  "minItems": 1,
+                  "maxItems": 5
+                },
+                "procedure": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "additionalProperties": false,
+                    "properties": {
+                      "op": {
+                        "enum": [
+                          "NAVIGATE",
+                          "INSPECT",
+                          "OPEN_IF_NEEDED",
+                          "ACQUIRE",
+                          "PLACE",
+                          "VERIFY"
+                        ]
+                      },
+                      "args": {
+                        "type": "array",
+                        "items": {
+                          "enum": [
+                            "target",
+                            "source",
+                            "destination",
+                            "candidate",
+                            "reachable(source)",
+                            "reachable(destination)",
+                            "reachable(candidate)",
+                            "at(source)",
+                            "at(destination)",
+                            "at(candidate)",
+                            "not_at(source)",
+                            "not_at(destination)",
+                            "not_at(candidate)",
+                            "closed(source)",
+                            "closed(destination)",
+                            "closed(candidate)",
+                            "open(source)",
+                            "open(destination)",
+                            "open(candidate)",
+                            "contents_observed(source)",
+                            "contents_observed(destination)",
+                            "contents_observed(candidate)",
+                            "contents_unobserved(source)",
+                            "contents_unobserved(destination)",
+                            "contents_unobserved(candidate)",
+                            "transfer_task(target,destination)",
+                            "holding(target)",
+                            "not_holding(target)",
+                            "placed(target,destination)",
+                            "placement_unconfirmed(target,destination)",
+                            "action_rejected()",
+                            "visible(target,source)",
+                            "visible(target,candidate)"
+                          ]
+                        },
+                        "minItems": 1,
+                        "maxItems": 2
+                      },
+                      "when": {
+                        "type": "array",
+                        "items": {
+                          "enum": [
+                            "reachable(source)",
+                            "reachable(destination)",
+                            "reachable(candidate)",
+                            "at(source)",
+                            "at(destination)",
+                            "at(candidate)",
+                            "not_at(source)",
+                            "not_at(destination)",
+                            "not_at(candidate)",
+                            "closed(source)",
+                            "closed(destination)",
+                            "closed(candidate)",
+                            "open(source)",
+                            "open(destination)",
+                            "open(candidate)",
+                            "contents_observed(source)",
+                            "contents_observed(destination)",
+                            "contents_observed(candidate)",
+                            "contents_unobserved(source)",
+                            "contents_unobserved(destination)",
+                            "contents_unobserved(candidate)",
+                            "transfer_task(target,destination)",
+                            "holding(target)",
+                            "not_holding(target)",
+                            "placed(target,destination)",
+                            "placement_unconfirmed(target,destination)",
+                            "action_rejected()",
+                            "visible(target,source)",
+                            "visible(target,candidate)"
+                          ]
+                        },
+                        "minItems": 0,
+                        "maxItems": 4
+                      }
+                    },
+                    "required": [
+                      "op",
+                      "args"
+                    ]
+                  },
+                  "minItems": 1,
+                  "maxItems": 8
+                },
+                "outcome_check": {
+                  "type": "array",
+                  "items": {
+                    "enum": [
+                      "reachable(source)",
+                      "reachable(destination)",
+                      "reachable(candidate)",
+                      "at(source)",
+                      "at(destination)",
+                      "at(candidate)",
+                      "not_at(source)",
+                      "not_at(destination)",
+                      "not_at(candidate)",
+                      "closed(source)",
+                      "closed(destination)",
+                      "closed(candidate)",
+                      "open(source)",
+                      "open(destination)",
+                      "open(candidate)",
+                      "contents_observed(source)",
+                      "contents_observed(destination)",
+                      "contents_observed(candidate)",
+                      "contents_unobserved(source)",
+                      "contents_unobserved(destination)",
+                      "contents_unobserved(candidate)",
+                      "transfer_task(target,destination)",
+                      "holding(target)",
+                      "not_holding(target)",
+                      "placed(target,destination)",
+                      "placement_unconfirmed(target,destination)",
+                      "action_rejected()",
+                      "visible(target,source)",
+                      "visible(target,candidate)"
+                    ]
+                  },
+                  "minItems": 1,
+                  "maxItems": 5
+                }
+              },
+              "required": [
+                "when",
+                "procedure",
+                "outcome_check"
+              ]
+            }
+          },
+          "required": [
+            "operation",
+            "skill_id",
+            "supporting_anchor_ids",
+            "applicability",
+            "procedure",
+            "outcome_check",
+            "fallback"
+          ]
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "operation": {
+              "const": "RETAIN"
+            },
+            "skill_id": {
+              "type": "string",
+              "minLength": 1
+            },
+            "supporting_anchor_ids": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              },
+              "minItems": 1
+            }
+          },
+          "required": [
+            "operation",
+            "skill_id",
+            "supporting_anchor_ids"
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  },
+  "required": [
+    "evidence_interpretation",
+    "skill_proposal"
+  ]
+}

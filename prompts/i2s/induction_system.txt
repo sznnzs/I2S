@@ -1,0 +1,44 @@
+Induce one compact, reusable semantic procedural skill after the completed task, using eligible localized intervention evidence. This is ONE joint evidence-interpretation and induction call. Output a JSON object with exactly two keys: evidence_interpretation and skill_proposal. Both may be null if no supported addition/refinement exists. Prefer a compact reusable relation supported by local evidence.
+
+Skill structure: I=observable applicability, P=ordered semantic procedure, O=observable verification. Semantic operators guide the acting model, which translates them into native environment commands. No final success, hidden evaluator, future task, or remembered object location may support a skill. The counterfactual outcome of a withheld SMALL proposal is UNKNOWN, even if a teacher command has an observed effect. An immediate navigation anchor supports arrival/state observation only; it does not establish that an alternative failed or that a search order is optimal. Explain the local procedural relation directly supported by the observation.
+
+Read the completed chronological trajectory as context. Only eligible_anchors/local_evidence support new procedural content. lossless-reference-pool-v1 $ref fields expand to exact fragments, not summaries. Every claimed new operation and outcome must be directly supported by cited local action/observation pairs. Do not turn a small observation into a complete generic task recipe. The induction should FIRST identify a missing prerequisite, order, observation/verification, or recovery relation, THEN construct a skill realizing that relation. Use one consistent role binding across all cited anchors in a proposal; cite a small sufficient subset.
+
+evidence_interpretation fields:
+- supporting_anchor_ids: nonempty list of actual eligible anchor IDs.
+- localized_facts: list of objects with anchor_id, transition_id, observation_before_quote, observation_after_quote, role_bindings. Both quotes must be exact substrings (at least eight characters) from that transition's localized observations. role_bindings is an object mapping canonical role names to the exact concrete entity names in the cited action/observation. This source-bound evidence section may contain instance numbers. Every cited anchor needs a fact. Do not quote the full trajectory as local support. Role bindings stay consistent within one proposal. target and destination must be named by this task's instruction.
+- procedural_residual: object with type (prerequisite, ordering_constraint, verification_step, recovery_rule, conditional_branch), rule (one certificate name below), relation (a precise English sentence explaining WHY this supported operation supplied missing procedural information, order, or verification). A statement to simply solve the task correctly is invalid.
+- implicated_skill_fields: list of changed field names for REVISE, or [] for ADD/RETAIN.
+
+skill_proposal fields:
+- operation: ADD, REVISE, or RETAIN; skill_id is null for ADD, exact existing ID otherwise.
+- supporting_anchor_ids: same IDs as evidence_interpretation.
+- applicability: nonempty list of observable predicates, interpreted conjunctively.
+- procedure: ordered list of semantic operation objects with op and args; optionally when (a list of observable conditions). Each operation is executed only when its current visible preconditions hold and its outcome is not already established.
+- outcome_check: nonempty list of observable predicates directly supported by the evidence.
+- fallback: object with when (nonempty conditions identifying failed/unconfirmed verification), procedure (nonempty conditional recovery operations), outcome_check (observable re-check after recovery). A state description without recovery is invalid. A guarded repetition of a supported operation is acceptable when followed by observable outcome verification.
+RETAIN needs only operation, skill_id, supporting_anchor_ids; use it if new evidence supports existing content without a needed semantic change. Do not duplicate an existing card as ADD. REVISE supplies the full resulting card, localizes changed fields, preserves every old procedure step in order and every supported old outcome, and does not broaden applicability. Add only locally supported operations/conditional checks. Serialize the full resulting card while preserving stable identity and inherited evidence. At most one proposal and one new version per task. Use current_skill_state for existing card identities and evidence-supported revision seeds.
+
+Canonical roles: target (exact task object), source (observed source receptacle), destination (task destination), candidate (one currently reachable receptacle being inspected). Bind each from the current task's instruction/observation; no particular source room/object location is stored in skill content. Use candidate for local inspection when no task destination relation is established. No instance names, numbers, paths, source IDs, angle-bracket placeholders, schema prose, or example words in applicability/procedure/outcome/fallback. Role names in operator arguments are variables, not placeholders to print as actions.
+
+Semantic operator signatures:
+NAVIGATE(receptacle_role): approach a currently reachable receptacle; supported by a matching arrival anchor.
+INSPECT(receptacle_role): read the contents explicitly revealed by a local arrival/opening observation at the bound receptacle.
+OPEN_IF_NEEDED(receptacle_role): when visibly closed and opening is currently possible, open to expose contents; supported by a matching opening anchor.
+ACQUIRE(target,source_or_candidate): take the visible exact target; supported by a matching take/possession anchor with both roles bound.
+PLACE(target,destination): place the held target at the currently reached destination; supported by a matching placement anchor with both roles bound.
+VERIFY(predicate): check the named observable predicate. Its one argument is the predicate string, including its parentheses.
+Represent operations as objects, not native command strings. args is always a list of strings. Guards are in optional when lists. Omit unused fields.
+
+Observable predicate signatures (strings containing parentheses; role arguments only):
+transfer_task(target,destination), reachable(receptacle_role), at(receptacle_role), not_at(receptacle_role), closed(receptacle_role), open(receptacle_role), contents_observed(receptacle_role), contents_unobserved(receptacle_role), visible(target,source_or_candidate), holding(target), not_holding(target), placed(target,destination), placement_unconfirmed(target,destination), action_rejected().
+They refer only to current instruction, visible history, inventory or current admissible actions. Unknown contents/location are not evidence of absence. Applicable guards cannot invent hidden state. Use the smallest sufficient applicability scope for the supported local relation.
+
+Residual proof certificate names and scope:
+arrival_reveals_state: navigation leads to a visible arrival/current receptacle state; target presence requires an explicit observation.
+opening_reveals_contents: a locally closed container is opened and its contents become observable.
+taking_establishes_possession: taking a visible target leads to observed pickup.
+placement_requires_arrival: ONLY when the SAME local anchor includes an executed failed placement followed by navigation to that exact destination; otherwise do not claim an ordering necessity from navigation alone.
+placement_confirmation: a placement action yields the local moved-to-destination acknowledgment; distinguish attempted placement from confirmed placement.
+recover_from_rejected_action: ONLY when the SAME local anchor includes an executed failure and successful correction. Scope the recovery to the locally observed conditions and correction.
+Choose the certificate that the evidence actually supports; the explanatory relation must agree with it. Direct effect support for each proposed operation is checked separately. A useful partial skill with one operation plus its verification is preferable to unsupported extra steps. Maximum eight procedure operations; keep the whole card below 900 estimated tokens. Return JSON only.

@@ -1,0 +1,87 @@
+benchmark: alfworld
+backend: local
+method: i2s
+output_root: runs
+prompt_root: prompts
+
+seeds:
+  sampling: 11
+  environment: 21
+  generation: 31
+
+policy:
+  type: i2s
+  model_id: qwen3_8b
+  large_model_id: large
+  prompt_id: i2s
+  prompt_contract: semantic_state
+  action_parser: skill_action_json
+  max_action_chars: 256
+  learning:
+    skills_enabled: true
+    grounding_validator: semantic
+    revision_mode: semantic
+    semantic_checks: local_role_recovery
+    semantic_visible_trajectory: true
+    phase_selected_induction: true
+    schema_constrained_induction: false
+    literal_evidence_index: true
+    trajectory_serialization: lossless_reference_pool
+    protocol_repair_version: i2s_skills_likelihood
+    native_evidence_version: native_public_feedback
+    induction_max_new_tokens: 16384
+    card_tokens: 900
+    max_skill_steps: 8
+    max_skills: 6
+    context_tokens: 2800
+    json_envelope_protocol: whole_json_fence
+    admission_reference_repair: source_reference_repair
+    teacher_observation_dedup: teacher_observation
+    induction_task_role_hints: public_task_role_types
+    task_role_parser_compatibility: alfworld_official_look_under
+
+router:
+  type: confidence_threshold
+  reliability_model_id: qwen3_8b_router
+  threshold: 0.99
+  missing_confidence: repair
+  include_episode_history: true
+  include_external_context: true
+  reason_max_chars: 320
+
+generation:
+  temperature: 0.6
+  top_p: 0.95
+  max_model_len: 40960
+  max_input_tokens: 32768
+  max_new_tokens: 8192
+  output_budget_policy: fixed_output
+
+context:
+  type: skill
+  history_max_steps: 100
+  external_context_max_tokens: 2800
+  input_safety_margin_ratio: 0.05
+  input_safety_margin_tokens: 1024
+  capacity_policy: oldest_first_fifo
+
+execution:
+  episode_workers: 1
+  family_workers: 6
+  max_calls_per_step: 8
+  episode_index_offset: 0
+
+repair:
+  bootstrap_consensus_samples: 1
+  continue_after_rejected_action: true
+  include_external_context: true
+  parse_retry_once: true
+  triggers:
+    invalid_action: true
+    no_progress: true
+    parse_failure: true
+    small_step_budget: null
+    visible_failure_markers: []
+
+model_pool:
+  length_recovery_protocol: length_retry_once

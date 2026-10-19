@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>From Intervention to Skill: Evolving Small–Large Language Model Collaboration</title>
+  <meta name="description" content="Intervention-to-Skill (I2S) turns selectively acquired large-model assistance into reusable skills that can improve future collaboration.">
+  <link rel="icon" type="image/png" href="./assets/i2s-logo.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light;
+      --paper: #fffffe;
+      --ink: #272343;
+      --text: #34384a;
+      --muted: #666978;
+      --rule: #dedee3;
+      --link: #405d68;
+      --serif: "Lora", Georgia, "Times New Roman", "Liberation Serif", serif;
+      --sans: "Plus Jakarta Sans", "Trebuchet MS", Helvetica, "Liberation Sans", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; background: var(--paper); color: var(--text); font: 16px/1.85 var(--sans); -webkit-font-smoothing: antialiased; }
+    a { color: var(--link); text-underline-offset: 4px; text-decoration-color: #b3bfc3; }
+    a:hover { color: var(--ink); text-decoration-color: currentColor; }
+    :focus-visible { outline: 2px solid var(--link); outline-offset: 5px; }
+    strong { color: var(--ink); font-weight: 600; }
+    img { display: block; max-width: 100%; height: auto; }
+    .page { max-width: 980px; margin: auto; padding: 32px 40px 40px; }
+    .group-bar { display: flex; align-items: center; padding-bottom: 18px; border-bottom: 1px solid var(--rule); }
+    .group-bar a { display: inline-flex; }
+    .group-logo { width: 277px; }
+    .project-header { padding: 38px 0 34px; border-bottom: 1px solid var(--rule); text-align: center; }
+    .project-logo { width: 120px; margin: 0 auto 22px; }
+    h1, h2, h3 { color: var(--ink); font-family: var(--serif); font-weight: 600; }
+    h1 { max-width: 840px; margin: 0 auto; font-size: clamp(1.85rem, 3.4vw, 2.65rem); line-height: 1.25; letter-spacing: -.035em; text-wrap: balance; }
+    .title-main { display: block; }
+    .title-detail { display: block; margin-top: 10px; font-size: .74em; font-weight: 500; line-height: 1.45; letter-spacing: -.025em; }
+    .nowrap { white-space: nowrap; }
+    .authors { margin-top: 25px; color: var(--ink); font-size: 1.1rem; line-height: 1.95; text-wrap: balance; }
+    .author { white-space: nowrap; }
+    .affils { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px 18px; margin: 12px auto 0; font-size: .96rem; line-height: 1.9; }
+    .contact { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px 18px; margin-top: 9px; font-size: .96rem; }
+    h2 { margin: 0 0 20px; font-size: 1.75rem; line-height: 1.3; letter-spacing: -.025em; }
+    h3 { margin: 28px 0 12px; font-size: 1.16rem; line-height: 1.45; }
+    .project-links { display: flex; flex-wrap: wrap; justify-content: center; gap: 14px 28px; margin-top: 26px; }
+    .project-links a { display: inline-flex; align-items: center; gap: 8px; color: var(--ink); font-weight: 600; white-space: nowrap; }
+    .link-icon { flex: 0 0 18px; width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+    section { margin-top: 52px; scroll-margin-top: 24px; }
+    p { margin: 0 0 17px; text-wrap: pretty; }
+    .lead { font-size: 1.03rem; }
+    ul, ol { padding-left: 1.4em; margin: 16px 0 0; }
+    li { padding-left: 5px; margin-bottom: 14px; }
+    li::marker { color: var(--muted); }
+    .features { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; margin-top: 16px; padding: 0; list-style: none; font-size: .92rem; line-height: 1.75; }
+    .features li { margin: 0; padding: 16px 0 0; border-top: 1px solid var(--rule); }
+    .features strong { display: block; margin-bottom: 7px; color: var(--ink); }
+    figure { margin: 28px 0 0; }
+    figure a { display: block; }
+    figure img { width: 100%; }
+    figcaption { max-width: 790px; margin: 12px auto 0; color: var(--muted); font-size: .8rem; line-height: 1.7; text-align: center; }
+    .table-scroll, .figure-scroll { overflow-x: auto; scrollbar-width: thin; scrollbar-color: #b8c2c4 transparent; }
+    .table-scroll { margin: 0 0 22px; }
+    table { width: 100%; min-width: 640px; border-collapse: collapse; font-size: .88rem; font-variant-numeric: tabular-nums; }
+    .table-caption { margin: 24px 0 12px; color: var(--muted); font-size: .8rem; line-height: 1.7; }
+    th, td { padding: 7px 12px; text-align: right; white-space: nowrap; }
+    th:first-child { text-align: left; }
+    thead { border-top: 1px solid var(--ink); border-bottom: 1px solid var(--rule); }
+    thead th[colspan] { text-align: center; }
+    tbody { border-bottom: 1px solid var(--rule); }
+    tbody:last-child { border-bottom-color: var(--ink); }
+    tbody tr + tr { border-top: 1px solid #ececef; }
+    tbody th[scope="row"] { font-weight: 400; }
+    .backend th { padding: 16px 12px 8px; color: var(--muted); font-size: .78rem; font-weight: 500; }
+    .ours { background: #f3f5f4; }
+    .ours strong { font-weight: 700; }
+    .metric-note { color: var(--muted); font-size: .86rem; line-height: 1.8; }
+    #acknowledgements p { font-size: .9rem; }
+    footer { margin-top: 50px; padding-top: 20px; border-top: 1px solid var(--rule); color: var(--muted); font-size: .76rem; line-height: 1.8; }
+    @media (max-width: 600px) {
+      body { font-size: 15px; line-height: 1.8; }
+      .page { padding: 22px 22px 30px; }
+      .group-logo { width: min(277px, 100%); }
+      .project-header { padding: 28px 0; }
+      .project-logo { width: 102px; margin-bottom: 20px; }
+      .title-detail { margin-top: 12px; font-size: .8em; line-height: 1.45; }
+      .authors { margin-top: 20px; font-size: 1rem; }
+      .affils, .contact { font-size: .9rem; }
+      .affils span { text-wrap: balance; }
+      .project-links { gap: 10px 18px; margin-top: 22px; font-size: .9rem; }
+      section { margin-top: 38px; }
+      h2 { margin-bottom: 16px; font-size: 1.5rem; }
+      h3 { font-size: 1.1rem; }
+      .lead { font-size: 1rem; }
+      .features { grid-template-columns: 1fr; gap: 16px; font-size: .92rem; }
+      .features li { padding-top: 13px; }
+      .features strong { margin-bottom: 4px; }
+      .figure-scroll img { min-width: 720px; max-width: none; }
+      th, td { padding: 7px 9px; }
+      thead th[rowspan] { width: 1%; }
+      thead th[rowspan], tbody th[scope="row"] { position: sticky; left: 0; z-index: 1; background: var(--paper); box-shadow: 1px 0 var(--rule); }
+      tbody .ours th[scope="row"] { background: #f3f5f4; }
+      .backend span { position: sticky; left: 9px; }
+    }
+    @media (max-width: 360px) {
+      .title-detail { font-size: 1.25rem; }
+    }
+    @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <div class="group-bar">
+      <a href="https://github.com/ModalityDance"><img class="group-logo" src="./assets/LOGOwithNameLong.svg" alt="ModalityDance" width="2006" height="166"></a>
+    </div>
+
+    <header class="project-header">
+      <img class="project-logo" src="./assets/i2s-logo.png" alt="I2S" width="1024" height="1024">
+      <h1><span class="title-main">From Intervention to Skill:</span> <span class="title-detail">Evolving <span class="nowrap">Small–Large</span> Language Model Collaboration</span></h1>
+      <div class="authors">
+        <span class="author">Zhenning Shi<sup>1</sup></span>,
+        <span class="author">Ran Wei<sup>2</sup></span>,
+        <span class="author">Ning Song<sup>2</sup></span>,
+        <span class="author">Yongqi Li<sup>1</sup></span>
+      </div>
+      <div class="affils">
+        <span><sup>1</sup>The Hong Kong Polytechnic University</span>
+        <span><sup>2</sup>Hangzhou Diagens Biotechnology Co., Ltd</span>
+      </div>
+      <div class="contact">
+        <a href="mailto:zhenning.shi@connect.polyu.hk">zhenning.shi@connect.polyu.hk</a>
+        <a href="mailto:liyongqi0@gmail.com">liyongqi0@gmail.com</a>
+      </div>
+      <nav class="project-links" aria-label="Project resources">
+        <a href="https://github.com/sznnzs/I2S">
+          <svg class="link-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="5" r="2"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M6 7v10M18 7v3a4 4 0 0 1-4 4H6"/></svg>
+          GitHub
+        </a>
+        <a href="https://github.com/sznnzs/I2S#running">
+          <svg class="link-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m8 6-6 6 6 6m8-12 6 6-6 6M14 3l-4 18"/></svg>
+          Usage Example
+        </a>
+      </nav>
+    </header>
+
+    <section id="overview">
+      <h2>Overview</h2>
+      <p class="lead"><strong>Intervention-to-Skill (I2S)</strong> turns selectively acquired large-model assistance into reusable skills that can improve future collaboration. Both acting models remain fixed during deployment, while accumulated skill state changes the effective small-model policy.</p>
+      <figure>
+        <a href="./assets/overview.pdf" aria-label="View the I2S workflow as a PDF"><img src="./assets/overview.png" alt="I2S combines selective intervention during a task, skill induction after the task, and skill evolution across the task stream." width="2400" height="1352"></a>
+        <figcaption>Overview of Intervention-to-Skill (I2S).</figcaption>
+      </figure>
+      <h3>Key Features</h3>
+      <ul class="features">
+        <li><strong>Reusable procedural skills.</strong> An intervention can reveal reusable procedural structure beyond the action itself, including how to order actions, verify outcomes, or recover from failures.</li>
+        <li><strong>Streamwise skill evolution.</strong> These skills persist across tasks and evolve as new evidence becomes available.</li>
+        <li><strong>Task quality and efficiency.</strong> Compared with SkillGen, the largest task-quality gain reaches 27.1 points and weighted token usage is reduced by as much as 63.2%.</li>
+      </ul>
+    </section>
+
+    <section id="abstract">
+      <h2>Abstract</h2>
+      <p>Small–large language model collaboration improves inference efficiency by assigning routine decisions to a smaller model and invoking a stronger model when additional capability is needed. Existing approaches primarily optimize this allocation for the current interaction, leaving the value of a large-model intervention largely transient. We study whether past interventions can instead enable collaboration to evolve. We introduce Intervention-to-Skill (I2S), which converts execution-supported large-model interventions into reusable skills. I2S localizes the decision opportunity at which stronger assistance is requested, grounds its effect in environment feedback, and uses trajectory context to identify a reusable procedural residual. The resulting skills persist across tasks and evolve with new evidence, allowing the effective small-model policy to improve while both acting models remain fixed.</p>
+      <p>Across ALFWorld, WebShop, and ScienceWorld with Qwen3-8B paired with Qwen3-32B, DeepSeek-V4-Flash, and Gemini-2.5-Flash, I2S consistently improves task quality over strong routing and skill-based baselines. Compared with SkillGen, task-quality gains reach 27.1 score points and weighted token usage is reduced by up to 63.2%. As skills accumulate, task quality increases while large-model involvement decreases, and acquired skills are repeatedly reused in later small-model decisions. These results establish small–large collaboration as a cumulative adaptation process in which previous assistance reshapes the future division of labor between models.</p>
+    </section>
+
+    <section id="method">
+      <h2>Method</h2>
+      <ol>
+        <li><strong>Selective intervention.</strong> During a task, action-conditioned selective intervention identifies small-model proposals that require stronger assistance. Deployment uses the fixed threshold γ = 0.99. Large-model assistance is triggered when proposal confidence falls below this threshold or when an execution-side recovery condition is observed.</li>
+        <li><strong>Skill induction.</strong> After task completion, trajectory-aware skill induction extracts the reusable procedural relation exposed by supported interventions.</li>
+        <li><strong>Skill evolution.</strong> <strong>Add</strong> introduces a skill for a procedural residual not yet represented in the state. <strong>Retain</strong> preserves an existing skill when the new evidence supports content already represented. <strong>Revise</strong> updates the evidence-implicated fields of an existing skill while preserving compatible procedural structure.</li>
+      </ol>
+    </section>
+
+    <section id="results">
+      <h2>Results</h2>
+      <p>We evaluate I2S on ALFWorld, WebShop, and ScienceWorld. Qwen3-8B serves as the small actor and is paired separately with Qwen3-32B, DeepSeek-V4-Flash, and Gemini-2.5-Flash as the large-model backend.</p>
+      <h3>Overall Performance and Token Usage</h3>
+      <p>I2S achieves the highest or tied-highest score in all nine benchmark–backend settings. Relative to SkillGen, I2S uses fewer weighted tokens in eight of nine settings while again improving task quality in all nine.</p>
+      <p class="table-caption" id="results-caption">Seven methods share task sets and order within each backend. Score retains the native benchmark metric and W denotes complete-stream weighted output tokens per task in thousands.</p>
+      <div class="table-scroll" role="region" aria-label="Task quality and weighted output-token results" tabindex="0">
+        <table aria-describedby="results-caption">
+          <thead>
+            <tr><th rowspan="2" scope="col">Method</th><th colspan="2" scope="colgroup">ALFWorld</th><th colspan="2" scope="colgroup">WebShop</th><th colspan="2" scope="colgroup">ScienceWorld</th></tr>
+            <tr><th scope="col">Score ↑</th><th scope="col">W ↓</th><th scope="col">Score ↑</th><th scope="col">W ↓</th><th scope="col">Score ↑</th><th scope="col">W ↓</th></tr>
+          </thead>
+          <tbody>
+            <tr class="backend"><th colspan="7" scope="rowgroup"><span>Qwen3-8B + Qwen3-32B</span></th></tr>
+            <tr><th scope="row">Small-Only</th><td>67.9</td><td>8.6</td><td>56.3</td><td>1.4</td><td>46.5</td><td>9.2</td></tr>
+            <tr><th scope="row">Large-Only</th><td>85.1</td><td>13.7</td><td>57.9</td><td>3.4</td><td>60.3</td><td>11.5</td></tr>
+            <tr><th scope="row">AutoMix</th><td>76.9</td><td>14.0</td><td>54.6</td><td>3.9</td><td>58.0</td><td>14.4</td></tr>
+            <tr><th scope="row">ExpeL</th><td>89.6</td><td>11.0</td><td>54.0</td><td>5.2</td><td>46.8</td><td>16.4</td></tr>
+            <tr><th scope="row">Cheatsheet</th><td>79.9</td><td>14.9</td><td>47.6</td><td>7.1</td><td>56.1</td><td>19.2</td></tr>
+            <tr><th scope="row">SkillGen</th><td>82.8</td><td>14.7</td><td>60.8</td><td>5.1</td><td>62.3</td><td>17.3</td></tr>
+            <tr class="ours"><th scope="row"><strong>I2S</strong></th><td><strong>90.3</strong></td><td>8.3</td><td><strong>64.1</strong></td><td>2.1</td><td><strong>73.9</strong></td><td>10.9</td></tr>
+          </tbody>
+          <tbody>
+            <tr class="backend"><th colspan="7" scope="rowgroup"><span>Qwen3-8B + DeepSeek-V4-Flash</span></th></tr>
+            <tr><th scope="row">Small-Only</th><td>67.9</td><td>9.2</td><td>56.3</td><td>1.1</td><td>51.9</td><td>8.2</td></tr>
+            <tr><th scope="row">Large-Only</th><td>98.5</td><td>7.1</td><td>71.1</td><td>3.1</td><td>87.0</td><td>29.0</td></tr>
+            <tr><th scope="row">AutoMix</th><td>94.0</td><td>10.4</td><td>67.5</td><td>3.5</td><td>72.2</td><td>27.2</td></tr>
+            <tr><th scope="row">ExpeL</th><td>99.3</td><td>6.5</td><td>67.0</td><td>5.4</td><td>87.6</td><td>15.5</td></tr>
+            <tr><th scope="row">Cheatsheet</th><td><strong>100.0</strong></td><td>10.2</td><td>69.8</td><td>11.0</td><td>83.6</td><td>10.9</td></tr>
+            <tr><th scope="row">SkillGen</th><td>97.8</td><td>9.4</td><td>69.9</td><td>7.0</td><td>87.8</td><td>24.3</td></tr>
+            <tr class="ours"><th scope="row"><strong>I2S</strong></th><td><strong>100.0</strong></td><td>6.0</td><td><strong>75.2</strong></td><td>6.5</td><td><strong>91.0</strong></td><td>31.6</td></tr>
+          </tbody>
+          <tbody>
+            <tr class="backend"><th colspan="7" scope="rowgroup"><span>Qwen3-8B + Gemini-2.5-Flash</span></th></tr>
+            <tr><th scope="row">Small-Only</th><td>70.9</td><td>8.3</td><td>56.6</td><td>1.2</td><td>49.5</td><td>8.7</td></tr>
+            <tr><th scope="row">Large-Only</th><td>85.8</td><td>1.1</td><td>66.8</td><td>0.3</td><td>53.5</td><td>1.1</td></tr>
+            <tr><th scope="row">AutoMix</th><td>84.3</td><td>7.1</td><td>65.1</td><td>1.7</td><td>57.5</td><td>6.0</td></tr>
+            <tr><th scope="row">ExpeL</th><td>82.1</td><td>7.7</td><td>67.7</td><td>1.7</td><td>61.9</td><td>7.2</td></tr>
+            <tr><th scope="row">Cheatsheet</th><td>87.3</td><td>6.3</td><td>64.0</td><td>2.1</td><td>62.5</td><td>6.9</td></tr>
+            <tr><th scope="row">SkillGen</th><td>85.8</td><td>9.8</td><td>67.7</td><td>2.7</td><td>56.2</td><td>7.8</td></tr>
+            <tr class="ours"><th scope="row"><strong>I2S</strong></th><td><strong>94.0</strong></td><td>3.6</td><td><strong>75.5</strong></td><td>1.1</td><td><strong>83.3</strong></td><td>4.0</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="metric-note">We measure complete-stream weighted token usage as <strong>W = L + 0.25S</strong>, where L and S are charged large-model and small-model output tokens.</p>
+      <h3>Evolution Across Deployment</h3>
+      <p>Collaboration shifts toward higher task quality with less large-model involvement as deployment progresses.</p>
+      <figure>
+        <div class="figure-scroll" role="region" aria-label="Skill evolution across deployment" tabindex="0"><a href="./assets/skill-evolution.png"><img src="./assets/skill-evolution.png" alt="Task score, large-model actions, large-model step ratio, and cumulative weighted token usage over deployment progress for three benchmarks and three large-model backends." width="2600" height="851" loading="lazy"></a></div>
+        <figcaption>Faint lines represent individual benchmark–backend settings, medium lines average the three large-model backends within each benchmark, and the thick red line averages all nine settings.</figcaption>
+      </figure>
+      <h3>Persistent Skill Reuse</h3>
+      <p>Procedural skills persist beyond the intervention that created them and are reused across later tasks. Across the main evaluation streams, 675 of 856 later skill-citing decisions are executed by the small model without large-model takeover. Among these executions, 519 receive a native environment acknowledgement aligned with the cited skill operation and expected outcome.</p>
+      <figure>
+        <div class="figure-scroll" role="region" aria-label="Skill-state updates and cross-task reuse" tabindex="0"><a href="./assets/skill-lifecycle.svg"><img src="./assets/skill-lifecycle.svg" alt="Skill update outcomes and later-task reuse depth across ALFWorld, WebShop, and ScienceWorld with three large-model backends." width="2200" height="960" loading="lazy"></a></div>
+        <figcaption>Upper bars show the distribution of candidate skill updates across Add, Retain, Revise, and rejection outcomes. Lower bars show the reuse depth of admitted skills. Columns correspond to the three benchmark environments, and rows correspond to the three large-model backends.</figcaption>
+      </figure>
+      <h3>Confidence Calibration</h3>
+      <p>Confidence calibration sharply improves proposal-level action assessment. ROC–AUC increases from 0.6488 to 0.9558, while ECE decreases from 24.88% to 1.63%. Across the full matched ALFWorld deployment, calibration increases task score by 5.22 percentage points while reducing LM Use by 24.01 percentage points.</p>
+      <figure>
+        <div class="figure-scroll" role="region" aria-label="Confidence calibration and deployment behavior" tabindex="0"><a href="./assets/confidence-calibration.svg"><img src="./assets/confidence-calibration.svg" alt="ROC–AUC, risk–coverage, and calibration and deployment results with and without confidence calibration on ALFWorld." width="2200" height="688" loading="lazy"></a></div>
+        <figcaption>All panels use the matched ALFWorld configuration with Qwen3-8B and DeepSeek-V4-Flash. Panels (a) and (b) evaluate proposal confidence. Panel (c) reports calibration error, task score, and large-model use.</figcaption>
+      </figure>
+    </section>
+
+    <section id="acknowledgements">
+      <h2>Acknowledgements</h2>
+      <p>We thank the teams behind <a href="https://github.com/QwenLM/Qwen3">Qwen3</a>, <a href="https://github.com/alfworld/alfworld">ALFWorld</a>, <a href="https://github.com/princeton-nlp/WebShop">WebShop</a>, <a href="https://github.com/allenai/ScienceWorld">ScienceWorld</a>, <a href="https://github.com/vllm-project/vllm">vLLM</a>, and <a href="https://github.com/huggingface/transformers">Transformers</a> for their open-source models, environments, and tools.</p>
+      <p>I2S is licensed under the <a href="https://github.com/sznnzs/I2S/blob/main/LICENSE">MIT License</a>.</p>
+    </section>
+
+    <footer>
+      I2S · <a href="https://github.com/ModalityDance">ModalityDance</a><br>
+      <a href="https://github.com/sznnzs/I2S/issues">Questions and feedback</a> · Updated October 2026.
+    </footer>
+  </main>
+</body>
+</html>

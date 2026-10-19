@@ -1,0 +1,111 @@
+actor:
+  provider: openai_compatible
+  role: small
+  model: Qwen3-8B
+  auth: none
+  base_url: ${I2S_SMALL_URL:-http://127.0.0.1:8000/v1}
+  reasoning_mode: enabled
+  send_seed: true
+  timeout_seconds: 600
+  max_retries: 3
+  retry_backoff_seconds: 2
+  response_format: {type: json_object}
+  extra_body:
+    chat_template_kwargs: {enable_thinking: true}
+    top_k: 20
+    min_p: 0
+    presence_penalty: 1.5
+  generation:
+    temperature: 0.6
+    top_p: 0.95
+    max_model_len: 40960
+    max_input_tokens: 32768
+    max_new_tokens: 8192
+
+scorer:
+  provider: openai_compatible
+  role: small
+  model: i2s-reliability
+  auth: none
+  base_url: ${I2S_ROUTER_URL:-http://127.0.0.1:8000/v1}
+  tokenizer_path: ${I2S_SMALL_MODEL:-Qwen/Qwen3-8B}
+  base_model: Qwen/Qwen3-8B
+  adapter_path: ${I2S_ADAPTER:-models/reliability}
+  scoring_mode: vllm_full_label_likelihood
+  reasoning_mode: disabled
+  send_seed: true
+  timeout_seconds: 600
+  max_retries: 0
+  extra_body:
+    chat_template_kwargs: {enable_thinking: false}
+  generation:
+    temperature: 0
+    top_p: 1
+    max_model_len: 40960
+    max_input_tokens: 16000
+    max_new_tokens: 1
+
+teachers:
+  local:
+    provider: openai_compatible
+    role: large
+    model: Qwen3-32B
+    auth: none
+    base_url: ${I2S_LARGE_URL:-http://127.0.0.1:8001/v1}
+    reasoning_mode: enabled
+    send_seed: true
+    timeout_seconds: 600
+    max_retries: 3
+    retry_backoff_seconds: 2
+    response_format: {type: json_object}
+    extra_body:
+      chat_template_kwargs: {enable_thinking: true}
+      top_k: 20
+      min_p: 0
+      presence_penalty: 1.5
+    generation:
+      temperature: 0.6
+      top_p: 0.95
+      max_model_len: 40960
+      max_input_tokens: 32768
+      max_new_tokens: 8192
+  deepseek:
+    provider: openai_compatible
+    role: large
+    model: deepseek-v4-flash
+    api_key_env: I2S_DEEPSEEK_API_KEY
+    base_url_env: I2S_DEEPSEEK_BASE_URL
+    reasoning_mode: enabled
+    send_seed: false
+    timeout_seconds: 600
+    max_retries: 3
+    retry_backoff_seconds: 2
+    response_format: {type: json_object}
+    extra_body:
+      thinking: {type: enabled}
+      reasoning_effort: high
+    generation:
+      temperature: 0.6
+      top_p: 0.95
+      max_model_len: 1000000
+      max_input_tokens: 983616
+      max_new_tokens: 16384
+  gemini:
+    provider: openai_compatible
+    role: large
+    model: gemini-2.5-flash
+    api_key_env: I2S_GEMINI_API_KEY
+    base_url_env: I2S_GEMINI_BASE_URL
+    reasoning_mode: enabled
+    send_seed: false
+    timeout_seconds: 600
+    max_retries: 3
+    retry_backoff_seconds: 2
+    response_format: {type: json_object}
+    extra_body: {}
+    generation:
+      temperature: 0.6
+      top_p: 0.95
+      max_model_len: 1000000
+      max_input_tokens: 983616
+      max_new_tokens: 16384

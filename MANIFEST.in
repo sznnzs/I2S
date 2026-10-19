@@ -1,0 +1,17 @@
+include README.md LICENSE environment.yaml .env.example
+recursive-include configs *.yaml
+recursive-include prompts *.txt *.json
+recursive-include scripts *.py
+recursive-include docs *.html *.svg *.pdf *.png
+include docs/.nojekyll
+prune data
+prune models
+include models/reliability/adapter_config.json
+include models/reliability/adapter_model.safetensors
+include models/reliability/reliability_config.json
+include models/reliability/tokenizer.json models/reliability/tokenizer_config.json
+include models/reliability/special_tokens_map.json models/reliability/added_tokens.json
+include models/reliability/vocab.json models/reliability/merges.txt
+include models/reliability/chat_template.jinja
+prune runs
+prune third_party

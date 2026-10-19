@@ -1,0 +1,137 @@
+alfworld:
+  config_path: ${I2S_ALFWORLD_CONFIG:-configs/environments/alfworld.yaml}
+  data_dir: ${I2S_ALFWORLD_DATA:-data/alfworld}
+  split: eval_out_of_distribution
+  scenario: pick_clean_then_place_in_recep
+  sample_count: 31
+  max_steps: 50
+  context:
+    history_max_tokens: 24000
+  repair:
+    max_actions_per_episode: 16
+    max_actions_per_intervention: 4
+  partition_role: evaluation
+  selection_file: null
+  exclude_task_ids: []
+  exclude_task_ids_file: null
+  sampling_group_key: null
+  invalid_action_policy: continue
+  worker_timeout_seconds: 300
+  runtime:
+    python: ${I2S_ENV_PYTHON:-}
+    env:
+      CUDA_VISIBLE_DEVICES: ""
+  families:
+    - name: look_at_obj_in_light
+      scenario: look_at_obj_in_light
+      sample_count: 18
+    - name: pick_and_place_simple
+      scenario: pick_and_place_simple
+      sample_count: 24
+    - name: pick_clean_then_place_in_recep
+      scenario: pick_clean_then_place_in_recep
+      sample_count: 31
+    - name: pick_cool_then_place_in_recep
+      scenario: pick_cool_then_place_in_recep
+      sample_count: 21
+    - name: pick_heat_then_place_in_recep
+      scenario: pick_heat_then_place_in_recep
+      sample_count: 23
+    - name: pick_two_obj_and_place
+      scenario: pick_two_obj_and_place
+      sample_count: 17
+
+webshop:
+  source_dir: ${I2S_WEBSHOP_SOURCE:-third_party/WebShop}
+  data_dir: ${I2S_WEBSHOP_DATA:-data/webshop}
+  index_dir: ${I2S_WEBSHOP_INDEX:-data/webshop/search_index}
+  catalog: full
+  human_goals: true
+  inventory_seed: 1
+  environment_profile: official_full_catalog
+  observation_mode: text_rich
+  retrieval_backend: pyserini_lucene_bm25_upstream
+  reward_nlp_backend: spacy_en_core_web_sm_3.7.1
+  search_protocol: native_search_any_page
+  split: evaluation
+  scenario:
+    category: fashion
+  sample_count: 20
+  max_steps: 15
+  context:
+    history_max_tokens: 12000
+  repair:
+    max_actions_per_episode: 8
+    max_actions_per_intervention: 3
+  max_actions: 0
+  partition_role: evaluation
+  selection_file: null
+  exclude_task_ids: []
+  exclude_task_ids_file: null
+  sampling_group_key: null
+  invalid_action_policy: continue
+  worker_timeout_seconds: 900
+  runtime:
+    python: ${I2S_ENV_PYTHON:-}
+    java_home: ${JAVA_HOME:-}
+    env:
+      CUDA_VISIBLE_DEVICES: ""
+  families:
+    - name: beauty
+      scenario: {category: beauty}
+      sample_count: 20
+    - name: electronics
+      scenario: {category: electronics}
+      sample_count: 20
+    - name: fashion
+      scenario: {category: fashion}
+      sample_count: 20
+    - name: garden
+      scenario: {category: garden}
+      sample_count: 20
+    - name: grocery
+      scenario: {category: grocery}
+      sample_count: 20
+
+scienceworld:
+  scenario: conductivity
+  split: evaluation
+  simplification: easy
+  sample_count: 25
+  max_steps: 100
+  context:
+    history_max_tokens: 20000
+  repair:
+    max_actions_per_episode: 30
+    max_actions_per_intervention: 4
+  target_entities: null
+  task_family_label: null
+  action_space_presentation: compact_actions_16
+  action_execution: official_text_parser
+  observation_presentation: response_look_inventory
+  history_presentation: action_response_only
+  partition_role: evaluation
+  selection_file: null
+  exclude_task_ids: []
+  exclude_task_ids_file: null
+  sampling_group_key: null
+  invalid_action_policy: continue
+  worker_timeout_seconds: 300
+  runtime:
+    python: ${I2S_ENV_PYTHON:-}
+    java_home: ${JAVA_HOME:-}
+    env:
+      CUDA_VISIBLE_DEVICES: ""
+  families:
+    - name: grow-plant
+      scenario: grow-plant
+      sample_count: 25
+    - name: measure-melting-point-known-substance
+      scenario: measure-melting-point-known-substance
+      sample_count: 25
+    - name: measure-melting-point-unknown-substance
+      scenario: measure-melting-point-unknown-substance
+      sample_count: 25
+    - name: conductivity
+      scenario: conductivity
+      sample_count: 25
