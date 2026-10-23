@@ -39,7 +39,7 @@ The implementation supports **ALFWorld**, **WebShop**, and **ScienceWorld**, wit
 
 ## 🔥 News
 
-- **[2026.10]** The I2S implementation and pretrained confidence adapter are available in this repository.
+- **[2026.10]** The I2S implementation is available in this repository.
 
 ## 📑 Table of Contents
 
@@ -79,14 +79,14 @@ Download benchmark assets and build the WebShop search index:
 python scripts/setup_environments.py all --download --build-index
 ```
 
-The confidence model is [I2S-Qwen3-8B-Confidence](https://huggingface.co/ModalityDance/I2S-Qwen3-8B-Confidence), based on [Qwen3-8B](https://huggingface.co/Qwen/Qwen3-8B). The commands below use the calibration adapter in [models/reliability](models/reliability).
+The pretrained confidence model is [I2S-Qwen3-8B-Confidence](https://huggingface.co/ModalityDance/I2S-Qwen3-8B-Confidence), a complete checkpoint based on [Qwen3-8B](https://huggingface.co/Qwen/Qwen3-8B). It loads directly with Transformers or vLLM.
 
 > [!NOTE]
 > Benchmark assets are stored in `data/`; WebShop source is installed in `third_party/`. Set existing asset paths in [configs/environments.yaml](configs/environments.yaml). `I2S_ENV_PYTHON` selects the environment interpreter, and `JAVA_HOME` selects Java.
 
 ### 3. Running <span id="running"></span>
 
-The small-model service hosts the Qwen3-8B actor and the confidence adapter. Choose a large-model backend:
+I2S uses Qwen3-8B for action generation and I2S-Qwen3-8B-Confidence for confidence scoring. Choose a large-model backend:
 
 | Backend | Large model | Service |
 | --- | --- | --- |
@@ -103,17 +103,24 @@ python -m pip install -e '.[serving]'
 CUDA_VISIBLE_DEVICES=0 python scripts/serve_models.py small
 ```
 
-For the local backend, start the teacher in a second terminal:
+Start the confidence model in a second terminal:
 
 ```bash
 conda activate i2s-serving
-CUDA_VISIBLE_DEVICES=1,2 python scripts/serve_models.py large --tensor-parallel-size 2
+CUDA_VISIBLE_DEVICES=1 python scripts/serve_models.py confidence
+```
+
+For the local backend, start the teacher in another terminal:
+
+```bash
+conda activate i2s-serving
+CUDA_VISIBLE_DEVICES=2,3 python scripts/serve_models.py large --tensor-parallel-size 2
 ```
 
 > [!TIP]
-> For a cloud teacher, set the endpoint and API key from [.env.example](.env.example), then run with `--backend deepseek` or `--backend gemini`. GPU assignments, tensor parallelism, and local weight paths can be adjusted for your hardware; `I2S_SMALL_MODEL` and `I2S_LARGE_MODEL` select the weights.
+> For a cloud teacher, set the endpoint and API key from [.env.example](.env.example), then run with `--backend deepseek` or `--backend gemini`. Adjust GPU assignments and tensor parallelism for your hardware. `I2S_SMALL_MODEL`, `I2S_CONFIDENCE_MODEL`, and `I2S_LARGE_MODEL` select the model weights.
 
-Run one ALFWorld task from a third terminal:
+Run one ALFWorld task in the I2S environment:
 
 ```bash
 conda activate i2s
@@ -150,10 +157,10 @@ i2s resolve --benchmark alfworld --backend local
 
 ### 4. Confidence Calibration <span id="confidence-calibration"></span>
 
-The included adapter supports all three benchmarks. Calibration uses rank-8 query/value adapters on Qwen3-8B and normalizes the likelihoods of the complete `UNCERTAIN` and `CONFIDENT` labels.
+The pretrained confidence model supports all three benchmarks. Confidence scoring normalizes the likelihoods of the complete `UNCERTAIN` and `CONFIDENT` labels.
 
 <details>
-<summary>Train a confidence adapter</summary>
+<summary>Train a confidence model</summary>
 
 Collect decision contexts from ALFWorld's training split with the model services running:
 
@@ -166,30 +173,31 @@ i2s run --benchmark alfworld --scenario pick_and_place_simple --tasks 100 \
   --run-id reliability_collection
 ```
 
-Prepare the data and train for three epochs. Training and validation use disjoint task identities.
+Prepare the data, train for three epochs, and export the complete model. Training and validation use disjoint task identities.
+
+> [!NOTE]
+> Stop serving processes before training on the same GPUs. Set `I2S_CONFIDENCE_MODEL` in both the serving and I2S terminals to use the exported model.
 
 ```bash
 python scripts/prepare_reliability_data.py \
   --runs runs/reliability_collection --output data/reliability
 CUDA_VISIBLE_DEVICES=0 python scripts/train_reliability.py
+python scripts/export_confidence_model.py --output runs/confidence_model
 ```
 
-> [!NOTE]
-> Stop serving processes before training on the same GPUs. The trained adapter is saved to `runs/reliability_training`. Set `I2S_ADAPTER` in both the serving and I2S terminals before using it.
-
-Restart the small-model service with the trained adapter:
+Start the trained confidence model:
 
 ```bash
 conda activate i2s-serving
-export I2S_ADAPTER=runs/reliability_training
-CUDA_VISIBLE_DEVICES=0 python scripts/serve_models.py small
+export I2S_CONFIDENCE_MODEL=runs/confidence_model
+CUDA_VISIBLE_DEVICES=1 python scripts/serve_models.py confidence
 ```
 
 </details>
 
 ### 5. Evaluation <span id="evaluation"></span>
 
-Confidence model: [ModalityDance/I2S-Qwen3-8B-Confidence](https://huggingface.co/ModalityDance/I2S-Qwen3-8B-Confidence).
+Pretrained model: [🤗 ModalityDance/I2S-Qwen3-8B-Confidence](https://huggingface.co/ModalityDance/I2S-Qwen3-8B-Confidence) · [Model files](https://huggingface.co/ModalityDance/I2S-Qwen3-8B-Confidence/tree/main).
 
 Compute benchmark metrics from a saved run:
 
@@ -201,13 +209,13 @@ i2s evaluate runs/alfworld_run
 Evaluation writes `metrics.json` and `validation.json`, including native task outcomes, interventions, and model usage. Weighted output tokens are **W = L + 0.25S**, where L and S include large- and small-model output tokens, reasoning, and retries.
 
 <details>
-<summary>Evaluate a newly trained confidence adapter</summary>
+<summary>Evaluate a newly trained confidence model</summary>
 
 Use the validation data prepared in Confidence Calibration:
 
 ```bash
 python scripts/train_reliability.py --evaluate-only \
-  --adapter runs/reliability_training \
+  --model runs/confidence_model \
   --validation data/reliability/validation.jsonl \
   --output runs/reliability_evaluation
 ```

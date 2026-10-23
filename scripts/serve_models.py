@@ -10,10 +10,16 @@ from pathlib import Path
 
 def command(args: argparse.Namespace) -> list[str]:
     small = args.role == "small"
-    model = args.model or os.environ.get(
-        "I2S_SMALL_MODEL" if small else "I2S_LARGE_MODEL",
-        "Qwen/Qwen3-8B" if small else "Qwen/Qwen3-32B",
-    )
+    settings = {
+        "small": ("I2S_SMALL_MODEL", "Qwen/Qwen3-8B", "Qwen3-8B", 8000, 40960),
+        "large": ("I2S_LARGE_MODEL", "Qwen/Qwen3-32B", "Qwen3-32B", 8001, 40960),
+        "confidence": (
+            "I2S_CONFIDENCE_MODEL", "ModalityDance/I2S-Qwen3-8B-Confidence",
+            "i2s-reliability", 8002, 16384,
+        ),
+    }
+    variable, default_model, served_name, port, max_length = settings[args.role]
+    model = args.model or os.environ.get(variable, default_model)
     result = [
         sys.executable,
         "-m",
@@ -21,28 +27,29 @@ def command(args: argparse.Namespace) -> list[str]:
         "--model",
         model,
         "--served-model-name",
-        "Qwen3-8B" if small else "Qwen3-32B",
+        served_name,
         "--host",
         args.host,
         "--port",
-        str(args.port or (8000 if small else 8001)),
+        str(args.port or port),
         "--tensor-parallel-size",
         str(args.tensor_parallel_size),
         "--reasoning-parser",
         "qwen3",
         "--generation-config",
         "vllm",
+        "--dtype",
+        args.dtype or ("float32" if args.role == "confidence" else "auto"),
         "--max-model-len",
-        str(args.max_model_len),
+        str(args.max_model_len or max_length),
         "--gpu-memory-utilization",
         str(args.gpu_memory_utilization),
         "--max-num-seqs",
         str(args.max_num_seqs),
     ]
-    if small and not args.without_adapter:
-        adapter = Path(
-            args.adapter or os.environ.get("I2S_ADAPTER", "models/reliability")
-        ).expanduser()
+    adapter_path = args.adapter or os.environ.get("I2S_ADAPTER")
+    if small and adapter_path and not args.without_adapter:
+        adapter = Path(adapter_path).expanduser()
         for name in ("adapter_config.json", "adapter_model.safetensors"):
             if not (adapter / name).is_file():
                 raise FileNotFoundError(
@@ -63,9 +70,10 @@ def command(args: argparse.Namespace) -> list[str]:
 
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Serve the calibrated actor or the local teacher.")
-    parser.add_argument("role", choices=("small", "large"))
+    parser = argparse.ArgumentParser(description="Serve the actor, confidence model, or teacher.")
+    parser.add_argument("role", choices=("small", "confidence", "large"))
     parser.add_argument("--model")
+    parser.add_argument("--dtype", choices=("auto", "float32", "float16", "bfloat16"))
     parser.add_argument("--adapter")
     parser.add_argument(
         "--without-adapter",
@@ -75,7 +83,7 @@ def main() -> None:
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int)
     parser.add_argument("--tensor-parallel-size", type=int, default=1)
-    parser.add_argument("--max-model-len", type=int, default=40960)
+    parser.add_argument("--max-model-len", type=int)
     parser.add_argument("--max-num-seqs", type=int, default=128)
     parser.add_argument("--gpu-memory-utilization", type=float, default=0.9)
     args = parser.parse_args()

@@ -10,7 +10,7 @@ from pathlib import Path
 
 from .io import append_jsonl
 from .models import ModelInvocationError, OpenAICompatibleModel
-from .router_lora import encode_pair
+from .confidence_scoring import encode_pair
 from .schemas import ModelCall, ModelUsage
 
 
@@ -53,7 +53,7 @@ def extract_score(response, info):
     return mass[1] / sum(mass), scores, lengths
 
 
-class LoRALikelihoodModel(OpenAICompatibleModel):
+class ConfidenceLikelihoodModel(OpenAICompatibleModel):
     def __init__(self, model_id, config):
         super().__init__(model_id, config)
         from transformers import AutoTokenizer
@@ -61,15 +61,17 @@ class LoRALikelihoodModel(OpenAICompatibleModel):
         self.tokenizer = AutoTokenizer.from_pretrained(
             config["tokenizer_path"], local_files_only=bool(config.get("local_files_only", False))
         )
-        adapter = Path(config["adapter_path"])
-        digest = hashlib.sha256((adapter / "adapter_model.safetensors").read_bytes()).hexdigest()
-        if config.get("adapter_sha256") and digest != config["adapter_sha256"]:
-            raise ValueError("Calibration adapter checkpoint hash mismatch")
-        self.adapter_sha256 = digest
-        base = json.loads((adapter / "adapter_config.json").read_text())["base_model_name_or_path"]
-        expected = str(config.get("base_model") or config["tokenizer_path"])
-        if base != expected and Path(base).resolve() != Path(expected).resolve():
-            raise ValueError("Calibration adapter and tokenizer backbones differ")
+        self.checkpoint = {"checkpoint": config["tokenizer_path"]}
+        if config.get("adapter_path"):
+            adapter = Path(config["adapter_path"])
+            digest = hashlib.sha256((adapter / "adapter_model.safetensors").read_bytes()).hexdigest()
+            if config.get("adapter_sha256") and digest != config["adapter_sha256"]:
+                raise ValueError("Calibration adapter checkpoint hash mismatch")
+            self.checkpoint["adapter_sha256"] = digest
+            base = json.loads((adapter / "adapter_config.json").read_text())["base_model_name_or_path"]
+            expected = str(config.get("base_model") or config["tokenizer_path"])
+            if base != expected and Path(base).resolve() != Path(expected).resolve():
+                raise ValueError("Calibration adapter and tokenizer backbones differ")
         self.audit = (
             Path(config["scoring_audit_path"]) if config.get("scoring_audit_path") else None
         )
@@ -78,7 +80,7 @@ class LoRALikelihoodModel(OpenAICompatibleModel):
     def _record(self, value):
         if self.audit is not None:
             with self.audit_lock:
-                append_jsonl(self.audit, {**value, "adapter_sha256": self.adapter_sha256})
+                append_jsonl(self.audit, {**value, **self.checkpoint})
 
     def generate(self, *, call_id, messages, purpose, generation, seed):
         if purpose != "confidence_assessment":

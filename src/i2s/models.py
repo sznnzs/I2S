@@ -380,9 +380,9 @@ class ModelPool:
             if provider != "openai_compatible":
                 raise ValueError(f"unsupported model provider: {provider}")
             if model_config.get("scoring_mode") == "vllm_full_label_likelihood":
-                from .lora_likelihood_model import LoRALikelihoodModel
+                from .confidence_likelihood_model import ConfidenceLikelihoodModel
 
-                self.models[model_id] = LoRALikelihoodModel(model_id, model_config)
+                self.models[model_id] = ConfidenceLikelihoodModel(model_id, model_config)
             else:
                 self.models[model_id] = OpenAICompatibleModel(model_id, model_config)
         return self.models[model_id]

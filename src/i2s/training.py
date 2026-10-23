@@ -10,7 +10,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any, Iterable, Mapping, Sequence
 
-from .router_lora import LABELS, assessment_messages, encode_pair, label_log_likelihoods
+from .confidence_scoring import LABELS, assessment_messages, encode_pair, label_log_likelihoods
 
 DEFAULT_MODEL = "Qwen/Qwen3-8B"
 THRESHOLDS = (0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.99)
@@ -820,20 +820,31 @@ def run_training(
 def run_evaluation(
     *,
     model: str,
-    adapter: Path,
+    adapter: Path | None = None,
     validation_path: Path,
     output: Path,
     model_id: str | None = None,
     device: str = "cuda:0",
     threshold: float = 0.99,
 ) -> dict[str, Any]:
-    reference = public_model_id(model, model_id)
-    metadata = check_adapter(adapter, reference)
+    if adapter is not None:
+        reference = public_model_id(model, model_id)
+        metadata = check_adapter(adapter, reference)
+    else:
+        from huggingface_hub import hf_hub_download
+
+        reference = model_id or model
+        metadata_path = (
+            Path(model) / "reliability_config.json"
+            if Path(model).is_dir()
+            else Path(hf_hub_download(model, "reliability_config.json"))
+        )
+        metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
     rows = read_records(validation_path)
     if set(metadata["training_task_hashes"]) & {task_key(row) for row in rows}:
-        raise ValueError("Evaluation tasks overlap the adapter's training tasks")
+        raise ValueError("Evaluation tasks overlap the confidence model's training tasks")
     if set(metadata["training_input_hashes"]) & {row["record_id"] for row in rows}:
-        raise ValueError("Evaluation visible inputs overlap the adapter's training inputs")
+        raise ValueError("Evaluation visible inputs overlap the confidence model's training inputs")
     if not 0 <= threshold <= 1:
         raise ValueError("threshold must lie in [0, 1]")
     torch, _, PeftModel, _, AutoModelForCausalLM, AutoTokenizer = _dependencies()
@@ -851,16 +862,20 @@ def run_evaluation(
         }
         base = AutoModelForCausalLM.from_pretrained(
             model,
-            torch_dtype=getattr(torch, metadata["dtype"]),
+            torch_dtype=getattr(torch, metadata.get("weight_dtype", metadata["dtype"])),
             attn_implementation="sdpa",
             device_map={"": device},
         )
-        network = PeftModel.from_pretrained(base, adapter, is_trainable=False).eval()
+        network = (
+            PeftModel.from_pretrained(base, adapter, is_trainable=False)
+            if adapter is not None else base
+        ).eval()
         predictions, result, usage = _evaluate(network, tokenizer, rows, encoded, threshold)
         report = {
             "metrics": result,
             "usage": usage,
-            "base_model": reference,
+            "model": reference,
+            "base_model": metadata["base_model"],
             "data_sha256": file_hash(validation_path),
             "reuses_training_validation": bool(
                 set(metadata.get("validation_task_hashes", [])) & {task_key(row) for row in rows}

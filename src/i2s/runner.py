@@ -93,8 +93,10 @@ def check_runtime(config: Mapping[str, Any]) -> None:
         resolve_credentials(model)
         if model.get("scoring_mode") != "vllm_full_label_likelihood":
             continue
-        if not model.get("adapter_path") or not model.get("tokenizer_path"):
-            raise ValueError("the reliability scorer requires adapter_path and tokenizer_path")
+        if not model.get("tokenizer_path"):
+            raise ValueError("the confidence scorer requires tokenizer_path")
+        if not model.get("adapter_path"):
+            continue
         adapter = _path(model["adapter_path"], root)
         for filename in ("adapter_model.safetensors", "adapter_config.json"):
             if not (adapter / filename).is_file():

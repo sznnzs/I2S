@@ -9,7 +9,7 @@ from i2s.training import DEFAULT_MODEL, TrainingConfig, run_evaluation, run_trai
 
 
 def main(argv=None) -> int:
-    parser = argparse.ArgumentParser(description="Train or evaluate the confidence adapter.")
+    parser = argparse.ArgumentParser(description="Train or evaluate the confidence model.")
     parser.add_argument(
         "--model",
         default=DEFAULT_MODEL,
@@ -17,7 +17,7 @@ def main(argv=None) -> int:
     )
     parser.add_argument(
         "--model-id",
-        help="Public owner/model ID; required when --model points to a local directory",
+        help="Public base-model ID when training from a local model directory",
     )
     parser.add_argument("--train", type=Path, default=Path("data/reliability/train.jsonl"))
     parser.add_argument(
@@ -44,7 +44,7 @@ def main(argv=None) -> int:
     parser.add_argument(
         "--evaluate-only",
         action="store_true",
-        help="Evaluate a saved adapter; requires --adapter and a new --output directory",
+        help="Evaluate a confidence checkpoint in --model and write to a new --output directory",
     )
     parser.add_argument(
         "--adapter", type=Path, help="Trained adapter directory, including reliability_config.json"
@@ -59,8 +59,6 @@ def main(argv=None) -> int:
         threshold=args.threshold,
     )
     if args.evaluate_only:
-        if args.adapter is None:
-            parser.error("--evaluate-only requires a trained calibration adapter via --adapter")
         report = run_evaluation(adapter=args.adapter, **common)
     else:
         if args.adapter is not None:
