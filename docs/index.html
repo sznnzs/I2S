@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>From Intervention to Skill: Evolving Small–Large Language Model Collaboration</title>
   <meta name="description" content="Intervention-to-Skill (I2S) turns selectively acquired large-model assistance into reusable skills that can improve future collaboration.">
+  <link rel="canonical" href="https://modalitydance.github.io/I2S/">
   <link rel="icon" type="image/png" href="./assets/i2s-logo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -78,6 +79,11 @@
     .ours { background: #f3f5f4; }
     .ours strong { font-weight: 700; }
     .metric-note { color: var(--muted); font-size: .86rem; line-height: 1.8; }
+    .bibtex-wrap { position: relative; }
+    .bibtex-wrap > p { padding-right: 80px; color: var(--muted); font-size: .9rem; }
+    pre { margin: 18px 0 0; padding: 22px 24px; background: #f5f5f3; color: var(--text); font: .8rem/1.8 ui-monospace, "Cascadia Code", Consolas, "Liberation Mono", "Courier New", monospace; white-space: pre-wrap; overflow-wrap: anywhere; overflow: auto; }
+    .copy-btn { position: absolute; top: 0; right: 0; padding: 3px 0; color: var(--link); background: none; border: 0; border-bottom: 1px solid #a4adb3; font: 500 .8rem/1.5 var(--sans); cursor: pointer; }
+    .copy-btn:hover { color: var(--ink); border-color: var(--ink); }
     #acknowledgements p { font-size: .9rem; }
     footer { margin-top: 50px; padding-top: 20px; border-top: 1px solid var(--rule); color: var(--muted); font-size: .76rem; line-height: 1.8; }
     @media (max-width: 600px) {
@@ -104,6 +110,7 @@
       thead th[rowspan], tbody th[scope="row"] { position: sticky; left: 0; z-index: 1; background: var(--paper); box-shadow: 1px 0 var(--rule); }
       tbody .ours th[scope="row"] { background: #f3f5f4; }
       .backend span { position: sticky; left: 9px; }
+      pre { padding: 18px 15px; font-size: .74rem; }
     }
     @media (max-width: 360px) {
       .title-detail { font-size: 1.25rem; }
@@ -135,11 +142,27 @@
         <a href="mailto:liyongqi0@gmail.com">liyongqi0@gmail.com</a>
       </div>
       <nav class="project-links" aria-label="Project resources">
-        <a href="https://github.com/sznnzs/I2S">
+        <a href="#citation" title="arXiv link to be added at publication">
+          <svg class="link-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 3H5v18h14V8ZM14 3v5h5M8 12h8M8 16h6"/></svg>
+          Paper
+        </a>
+        <a href="https://github.com/ModalityDance/I2S">
           <svg class="link-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="6" cy="5" r="2"/><circle cx="6" cy="19" r="2"/><circle cx="18" cy="5" r="2"/><path d="M6 7v10M18 7v3a4 4 0 0 1-4 4H6"/></svg>
           GitHub
         </a>
-        <a href="https://github.com/sznnzs/I2S#running">
+        <a href="#citation" title="Hugging Face Paper link to be added at publication">
+          <svg class="link-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5c-3-2-6-2-10-1v15c4-1 7-1 10 1 3-2 6-2 10-1V4c-4-1-7-1-10 1ZM12 5v15"/></svg>
+          Hugging Face Paper
+        </a>
+        <a href="https://huggingface.co/ModalityDance/I2S-Qwen3-8B-Confidence" title="Planned Hugging Face model repository">
+          <svg class="link-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 2 9 5v10l-9 5-9-5V7ZM3 7l9 5 9-5M12 12v10M7.5 4.5l9 5"/></svg>
+          Hugging Face Model
+        </a>
+        <a href="https://github.com/ModalityDance/I2S#data" title="Hugging Face Data link to be added at release">
+          <svg class="link-icon" viewBox="0 0 24 24" aria-hidden="true"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14c0 1.7 4 3 9 3s9-1.3 9-3V5M3 12c0 1.7 4 3 9 3s9-1.3 9-3"/></svg>
+          Hugging Face Data
+        </a>
+        <a href="https://github.com/ModalityDance/I2S#usage-example">
           <svg class="link-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m8 6-6 6 6 6m8-12 6 6-6 6M14 3l-4 18"/></svg>
           Usage Example
         </a>
@@ -241,16 +264,48 @@
       </figure>
     </section>
 
+    <section id="citation">
+      <h2>Citation</h2>
+      <div class="bibtex-wrap">
+        <button class="copy-btn" id="copy-btn" type="button" aria-label="Copy BibTeX citation" aria-live="polite">Copy</button>
+        <p>Please cite our paper as:</p>
+        <pre id="bibtex" tabindex="0">@misc{shi2026i2s,
+  title  = {From Intervention to Skill: Evolving Small--Large Language Model Collaboration},
+  author = {Zhenning Shi and Ran Wei and Ning Song and Yongqi Li},
+  year   = {2026},
+  url    = {https://github.com/ModalityDance/I2S}
+}</pre>
+      </div>
+    </section>
+
     <section id="acknowledgements">
       <h2>Acknowledgements</h2>
       <p>We thank the teams behind <a href="https://github.com/QwenLM/Qwen3">Qwen3</a>, <a href="https://github.com/alfworld/alfworld">ALFWorld</a>, <a href="https://github.com/princeton-nlp/WebShop">WebShop</a>, <a href="https://github.com/allenai/ScienceWorld">ScienceWorld</a>, <a href="https://github.com/vllm-project/vllm">vLLM</a>, and <a href="https://github.com/huggingface/transformers">Transformers</a> for their open-source models, environments, and tools.</p>
-      <p>I2S is licensed under the <a href="https://github.com/sznnzs/I2S/blob/main/LICENSE">MIT License</a>.</p>
+      <p>I2S is licensed under the <a href="https://github.com/ModalityDance/I2S/blob/main/LICENSE">MIT License</a>.</p>
     </section>
 
     <footer>
       I2S · <a href="https://github.com/ModalityDance">ModalityDance</a><br>
-      <a href="https://github.com/sznnzs/I2S/issues">Questions and feedback</a> · Updated October 2026.
+      <a href="https://github.com/ModalityDance/I2S/issues">Questions and feedback</a> · Updated October 2026.
     </footer>
   </main>
+  <script>
+    const copyButton = document.getElementById("copy-btn");
+    copyButton.addEventListener("click", async () => {
+      const citation = document.getElementById("bibtex");
+      try {
+        await navigator.clipboard.writeText(citation.textContent);
+        copyButton.textContent = "Copied";
+        setTimeout(() => { copyButton.textContent = "Copy"; }, 1500);
+      } catch {
+        const range = document.createRange();
+        range.selectNodeContents(citation);
+        const selection = window.getSelection();
+        selection.removeAllRanges();
+        selection.addRange(range);
+        citation.focus();
+      }
+    });
+  </script>
 </body>
 </html>
