@@ -15,9 +15,6 @@
   <a href="https://huggingface.co/ModalityDance/I2S-Qwen3-8B-Confidence" title="Planned Hugging Face model repository">
     <img src="https://img.shields.io/badge/Hugging%20Face-Model-fcc21b?style=for-the-badge&amp;logo=huggingface&amp;logoColor=white" alt="Hugging Face Model">
   </a>
-  <a href="#data" title="Hugging Face Data link to be added at release">
-    <img src="https://img.shields.io/badge/Hugging%20Face-Data-fcc21b?style=for-the-badge&amp;logo=huggingface&amp;logoColor=white" alt="Hugging Face Data">
-  </a>
   <a href="./LICENSE">
     <img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="MIT License">
   </a>
